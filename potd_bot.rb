@@ -26,6 +26,6 @@ end
 
 pokemon_sprite = open("#{pokemon_info["sprites"]["front_default"]}", "r")
 
-toot_media = client.upload_media(pokemon_sprite)
+toot_media = Mastodon::REST::Media.upload_media(pokemon_sprite)
 
 client.create_status("The Pokémon of the day is: #{pokemon_name.capitalize}! :#{pokemon_name}\nDiscuss!", media_ids = [ toot_media.id ])
