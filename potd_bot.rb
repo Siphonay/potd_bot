@@ -15,6 +15,8 @@ client = Mastodon::REST::Client.new(
   bearer_token: ENV["MASTODON_TOKEN"]
 )
 
+client.create_app('PotD', 'https://siphonay.fr')
+
 pokemon_id = rand(807) + 1
 
 pokemon_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon/#{pokemon_id}"))
