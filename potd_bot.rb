@@ -7,7 +7,7 @@
 require 'rest-client'
 require 'mastodon'
 require 'json'
-require 'open_uri'
+require 'open-uri'
 
 client = Mastodon::REST::Client.new(
   base_url: ENV["MASTODON_INSTANCE"],
@@ -18,7 +18,11 @@ pokemon_id = rand(807) + 1
 
 pokemon_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon/#{pokemon_id}"))
 
-pokemon_name = pokemon_info["name"].slice(0..(pokemon_info["name"].index('-')))
+pokemon_name = pokemon_info["name"]
+
+if pokemon_name.include? "-"
+  pokemon_name = pokemon_name.slice(0..(pokemon_name.index('-')))
+end
 
 pokemon_sprite = open("#{pokemon_info["sprites"]["front_default"]}", "r")
 
