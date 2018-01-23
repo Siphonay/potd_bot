@@ -22,7 +22,7 @@ pokemon_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon/#{po
 pokemon_name = pokemon_info["name"]
 
 if pokemon_name.include? "-"
-  pokemon_name = pokemon_name.slice(0..(pokemon.index('-')))
+  pokemon_name = pokemon_name.slice(0..(pokemon_name.index('-')))
 end
 
 File.open("sprite.png", "wb") do |sprite_file| 
