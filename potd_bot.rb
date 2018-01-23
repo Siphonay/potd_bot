@@ -8,6 +8,7 @@ require 'rest-client'
 require 'mastodon'
 require 'json'
 require 'open-uri'
+require 'http-form_data'
 
 client = Mastodon::REST::Client.new(
   base_url: ENV["MASTODON_INSTANCE"],
@@ -21,11 +22,15 @@ pokemon_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon/#{po
 pokemon_name = pokemon_info["name"]
 
 if pokemon_name.include? "-"
-  pokemon_name = pokemon_name.slice(0..(pokemon_name.index('-')))
+  pokemon_name = pokemon_name.slice(0..(pokemon.index('-')))
 end
 
-pokemon_sprite = open("#{pokemon_info["sprites"]["front_default"]}", "r")
+File.open("sprite.png", "wb") do |sprite_file| 
+  open("#{pokemon_info["sprites"]["front_default"]}", "r") do |read_file|
+    sprite_file.write(read_file.read)
+  end
+end
 
-toot_media = Mastodon::REST::Media.upload_media(pokemon_sprite)
+toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"))
 
 client.create_status("The Pokémon of the day is: #{pokemon_name.capitalize}! :#{pokemon_name}\nDiscuss!", media_ids = [ toot_media.id ])
