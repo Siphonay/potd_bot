@@ -9,7 +9,6 @@ require 'mastodon'
 require 'json'
 require 'open-uri'
 require 'http/form_data'
-require 'FileUtils'
 
 client = Mastodon::REST::Client.new(
   base_url: ENV["MASTODON_INSTANCE"],
@@ -34,6 +33,6 @@ end
 
 toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"))
 
-FileUtils.rm("sprite.png")
+File.delete("sprite.png")
 
 client.create_status("The Pokémon of the day is: #{pokemon_name.capitalize}! :#{pokemon_name}\nDiscuss!", media_ids = [ toot_media.id ])
