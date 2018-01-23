@@ -15,7 +15,7 @@ client = Mastodon::REST::Client.new(
   bearer_token: ENV["MASTODON_TOKEN"]
 )
 
-client.create_app('PotD', 'https://siphonay.fr')
+client.create_app(ENV["MASTODON_APP_NAME"], ENV["MASTODON_APP_SITE"])
 
 pokemon_id = rand(807) + 1
 
