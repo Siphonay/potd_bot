@@ -44,4 +44,4 @@ toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"))
 File.delete("sprite.png")
 
 # Post the toot containing the capitalized Pokémon name, the emojo of the corresponding Pokémon and its sprite as a media
-client.create_status("The Pokémon of the day is: #{pokemon_name.capitalize}! :#{pokemon_name}:\nDiscuss!", media_ids: toot_media.id)
+client.create_status("The Pokémon of the day is: #{pokemon_name.capitalize}! :#{pokemon_name}:\nDiscuss! #pokemonoftheday", media_ids: toot_media.id)
