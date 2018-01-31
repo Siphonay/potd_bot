@@ -27,7 +27,7 @@ pokemon_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon/#{po
 # Remove particules from the name if any
 pokemon_name = pokemon_info["name"]
 if pokemon_name.include? "-"
-  pokemon_name = pokemon_name.slice(0..(pokemon_name.index('-')))
+  pokemon_name = pokemon_name.slice(0..(pokemon_name.index('-') - 1))
 end
 
 # Download sprite
