@@ -38,7 +38,7 @@ File.open("sprite.png", "wb") do |sprite_file|
 end
 
 # Upload the sprite to the instance
-toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"))
+toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"), "Sprite of #{pokemon_name.capitalize}")
 
 # Remove the downloaded sprite
 File.delete("sprite.png")
