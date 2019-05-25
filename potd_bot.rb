@@ -16,7 +16,6 @@ client = Mastodon::REST::Client.new(
   base_url: ENV["MASTODON_INSTANCE"],
   bearer_token: ENV["MASTODON_TOKEN"]
 )
-client.create_app(ENV["MASTODON_APP_NAME"], ENV["MASTODON_APP_SITE"])
 
 # Choose a random Pokémon from the Pokédex
 pokemon_id = rand(807) + 1
