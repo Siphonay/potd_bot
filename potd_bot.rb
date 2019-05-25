@@ -18,30 +18,70 @@ client = Mastodon::REST::Client.new(
 )
 client.create_app(ENV["MASTODON_APP_NAME"], ENV["MASTODON_APP_SITE"])
 
-# Choose a random Pokémon from the Pokédex
+# An aside on PokéAPI nomenclature:
+#   Species (/pokemon-species) are fairly self explanatory. They're what you
+#   find in the Pokédex.
+#
+#   Varieties (/pokemon) are variations within a species that matter in combat,
+#   whether they are temporary or permanent. Most species have only one.
+#       Aegislash Blade Forme vs Shield Forme, Venusaur vs Mega Venusaur,
+#       different sizes of Gourgeist, disguised Mimikyu vs busted Mimikyu...
+#       are all different varieties.
+#
+#   Forms (/pokemon-forms) are cosmetic variations... mostly. A variety has one
+#   or more forms, most have only one.
+#       Different Flabébé colorations, East and West Gastrodon,
+#       Pichu vs Spiky-Eared Pichu... are all different forms.
+#
+# Here we will pick a random species, a random variety from it, and a random
+# form from the variety. We'll use the name and emojo from the species and the
+# sprite from the form.
+
+# Choose a random species from the Pokédex
 pokemon_id = rand(807) + 1
 
-# Fetch the JSON data file from the selected Pokémon from the PokéAPI and parse it
-pokemon_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon/#{pokemon_id}"))
+# Fetch the JSON data file from the selected species from the PokéAPI and parse it
+species_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon-species/#{pokemon_id}"))
 
-# Remove particules from the name if any
-pokemon_name = pokemon_info["name"]
-if pokemon_name.include? "-"
-  pokemon_name = pokemon_name.slice(0..(pokemon_name.index('-') - 1))
+def find_english_name(thing)
+  # Find the english name of a species or form.
+  # If there is no english name somehow, capitalize the species identifier instead.
+  name = nil
+  if thing['names']
+    name_info = thing['names'].detect { |name| name['language']['name'] == 'en' }
+    if name_info
+      name = name_info['name']
+    end
+  end
+  name or thing['name'].capitalize.gsub('-', ' ')
 end
+
+species_name = find_english_name(species_info)
+
+# Pick a random pokémon variety from the species, and a random form from the variety,
+# fetching each from PokéAPI
+variety_url = species_info['varieties'].sample['pokemon']['url']
+variety_info = JSON.parse(RestClient.get(variety_url))
+form_url = variety_info['forms'].sample['url']
+form_info = JSON.parse(RestClient.get(form_url))
+
+form_name = find_english_name(species_info)
+
+# Transform species name to get emojo name
+emojo = species_info['name'].gsub('-', '_')
 
 # Download sprite
 File.open("sprite.png", "wb") do |sprite_file| 
-  open("#{pokemon_info["sprites"]["front_default"]}", "r") do |read_file|
+  open("#{form_info["sprites"]["front_default"]}", "r") do |read_file|
     sprite_file.write(read_file.read)
   end
 end
 
 # Upload the sprite to the instance
-toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"), params = { description: "Sprite of #{pokemon_name.capitalize}" })
+toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"), params = { description: "Sprite of #{form_name}" })
 
 # Remove the downloaded sprite
 File.delete("sprite.png")
 
 # Post the toot containing the capitalized Pokémon name, the emojo of the corresponding Pokémon and its sprite as a media
-client.create_status("The Pokémon of the day is: #{pokemon_name.capitalize}! :#{pokemon_name}:\nDiscuss! #PokemonOfTheDay", media_ids: toot_media.id)
+client.create_status("The Pokémon of the day is: #{species_name}! :#{emojo}:\nDiscuss! #PokemonOfTheDay", media_ids: toot_media.id)
