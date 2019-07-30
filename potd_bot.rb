@@ -36,8 +36,12 @@ client = Mastodon::REST::Client.new(
 # form from the variety. We'll use the name and emojo from the species and the
 # sprite from the form.
 
+# Find how many species there are in the Pokédex
+all_species = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon-species/"))
+dex_size = all_species['count']
+
 # Choose a random species from the Pokédex
-pokemon_id = rand(807) + 1
+pokemon_id = rand(dex_size) + 1
 
 # Fetch the JSON data file from the selected species from the PokéAPI and parse it
 species_info = JSON.parse(RestClient.get("https://pokeapi.co/api/v2/pokemon-species/#{pokemon_id}"))
