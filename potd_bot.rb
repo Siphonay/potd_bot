@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 # Pokémon of the Day Mastodon bot
-# Written in Ruby by Alexis « Siphonay » Viguié on the 23-01-2018
 # Check the attached LICENSE file
 
 # Load required gems
@@ -74,11 +73,7 @@ form_name = find_english_name(species_info)
 emojo = species_info['name'].gsub('-', '_')
 
 # Download sprite
-File.open("sprite.png", "wb") do |sprite_file| 
-  open("#{form_info["sprites"]["front_default"]}", "r") do |read_file|
-    sprite_file.write(read_file.read)
-  end
-end
+IO.copy_stream(URI.open("#{form_info["sprites"]["front_default"]}"), "sprite.png")
 
 # Upload the sprite to the instance
 toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"), params = { description: "Sprite of #{form_name}" })
