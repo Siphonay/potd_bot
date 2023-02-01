@@ -72,14 +72,16 @@ form_name = find_english_name(species_info)
 # Transform species name to get emojo name
 emojo = species_info['name'].gsub('-', '_')
 
-# Download sprite
-IO.copy_stream(URI.open("#{form_info["sprites"]["front_default"]}"), "sprite.png")
+# Download artwork, get sprite if available, otherwise get official artwork
+artwork_url = form_info["sprites"]["front_default"]
+artwork_url = variety_info["sprites"]["other"]["official-artwork"]["front_default"] if !artwork_url
+IO.copy_stream(URI.open(artwork_url), "artwork.png")
 
-# Upload the sprite to the instance
-toot_media = client.upload_media(HTTP::FormData::File.new("sprite.png"), params = { description: "Sprite of #{form_name}" })
+# Upload the artwork to the instance
+toot_media = client.upload_media(HTTP::FormData::File.new("artwork.png"), params = { description: "Artwork of #{form_name}" })
 
-# Remove the downloaded sprite
-File.delete("sprite.png")
+# Remove the downloaded artwork
+File.delete("artwork.png")
 
 # Post the toot containing the capitalized Pokémon name, the emojo of the corresponding Pokémon and its sprite as a media
 client.create_status("The Pokémon of the day is: #{species_name}! :#{emojo}:\nDiscuss! #PokemonOfTheDay", media_ids: toot_media.id)
